@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaaSCalc: SaaS Pricing Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        select, input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background: #5cb85c;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #4cae4c;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 10px;
+            background: #e9e9e9;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SaaSCalc: SaaS Pricing Calculator</h1>
+        <form id="pricing-form">
+            <label for="tier">Select Tier:</label>
+            <select id="tier" required>
+                <option value="basic">Basic</option>
+                <option value="pro">Pro</option>
+                <option value="enterprise">Enterprise</option>
+            </select>
+            
+            <label for="users">Number of Users:</label>
+            <input type="number" id="users" required min="1">
+            
+            <label for="storage">Storage (GB):</label>
+            <input type="number" id="storage" required min="1">
+            
+            <button type="submit">Calculate Price</button>
+        </form>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        document.getElementById('pricing-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const tier = document.getElementById('tier').value;
+            const users = document.getElementById('users').value;
+            const storage = document.getElementById('storage').value;
+            
+            fetch('/calculate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({tier, users, storage}),
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultDiv = document.getElementById('result');
+                resultDiv.innerHTML = `
+                    <h3>Pricing Breakdown:</h3>
+                    <p>Base Price: $${data.base_price}</p>
+                    <p>Extra Users Cost: $${data.user_price}</p>
+                    <p>Extra Storage Cost: $${data.storage_price}</p>
+                    <h4>Total Price: $${data.total_price}</h4>
+                `;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
